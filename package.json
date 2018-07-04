@@ -1,0 +1,32 @@
+{
+  "name": "FacebookReact",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "react-native-scripts": "1.14.0",
+    "jest-expo": "~27.0.0",
+    "react-test-renderer": "16.3.1"
+  },
+  "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
+  "scripts": {
+    "start": "react-native-scripts start",
+    "eject": "react-native-scripts eject",
+    "android": "react-native-scripts android",
+    "ios": "react-native-scripts ios",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "jest-expo"
+  },
+  "dependencies": {
+    "Base64": "^1.0.1",
+    "base-64": "^0.1.0",
+    "expo": "^27.0.1",
+    "react": "16.3.1",
+    "react-native": "~0.55.2",
+    "react-native-datepicker-dialog": "0.0.9",
+    "react-native-multiple-select": "^0.4.4",
+    "react-native-textinput-effects": "^0.4.2",
+    "react-navigation": "^2.5.5"
+  }
+}

@@ -380,15 +380,16 @@ export class Explore_Friends extends React.Component{
   });
 
   render(){
-    let {auth} = this.props.navigation.state.params;
-    console.log(auth);
+    // let {auth} = this.props.navigation.state.params;
+    // console.log(auth);
     return(
       <ScrollView>
         <View style={this.styles.container}>
-          <FriendRequest auth={auth}/>
+          <Text>Explore_Friends</Text>
+          {/* <FriendRequest auth={auth}/>
           <View style={{marginTop:30}}>
             <PeopleYouMayKnow auth={auth} style={{marginTop:30}}/>
-          </View>
+          </View> */}
         </View>
       </ScrollView>
     );

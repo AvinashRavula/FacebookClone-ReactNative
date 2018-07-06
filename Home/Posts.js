@@ -5,7 +5,8 @@ import {Video} from 'expo';
 import { NavigationActions } from 'react-navigation';
 import { Sae } from 'react-native-textinput-effects';
 import { TextInput } from 'react-native-gesture-handler';
-
+import { Avatar } from 'react-native-elements';
+import { ClickableIcon } from "./MainScreen";
 
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -145,21 +146,34 @@ class Post extends Component{
         let likes_ids = post.likes_ids? post.likes_ids.split(',') : [];
         let like_state = likes_ids.indexOf(user_id.toString()) >= 0;
         return(
-             user_id && <View style={{margin:10, backgroundColor:'#f7f7f9'}}>
-                <View style={{flex:1,flexDirection:'row'}}>
+             user_id && <View style={{marginTop:10, backgroundColor:'white'}}>
+                {/* <View style={{flexDirection:'row'}}>
                     <Button title="Delete" style={{width:20,height:20, fontSize:20}}
                                 onPress={this._deletePost}/>
                     <Button title="Edit" style={{width:20,height:20, fontSize:20}}
                                 onPress={this._editPost}/>
+                </View> */}
+                <View style={{flexDirection:'row', margin:10}}>
+                    <View style={{flex:1}}>
+                        <Avatar small rounded 
+                                onPress={() => console.log("Works!")}
+                                source={require('../assets/facebook-logo-black-and-white-png-small.png')}
+                                activeOpacity={0.7}/>
+                    </View>
+                    <View style={{flex:3}}>
+                        <Text style={{fontWeight:'bold', color:fb_color}}>{post.first_name} {post.last_name} </Text>
+                        {post.tagged_ids ? <Text>is with { post.tagged_ids}</Text> : <Text> added a new post</Text>}
+                    </View>
+                    <View style={{flex:1}}>
+                        <ClickableIcon name="camera" color="white"/>,
+                    </View>
                 </View>
-                <Text style={{fontWeight:'bold', color:fb_color}}>{post.first_name} {post.last_name} </Text>
-                {post.tagged_ids ? <Text>is with { post.tagged_ids}</Text> : <Text> added a new post</Text>}
+                
+                
                 <Text style={{fontSize:20}}>{post.captions}</Text>
                 {
                     post.attachments.map((attachment) =>
                     {
-                        // subparts = attachment.split(" : ");
-                        // console.log(subparts);
                         return <Attachment item={attachment} key={attachment.id}/>
                     })
 
@@ -271,8 +285,8 @@ export default class AllPosts extends Component{
             //         auth_token={this.props.auth_token}/> : <Text>Avinash</Text>
             //     }
             // </View>
-             <View style={{margin:20}}>
-                <Button title="Refresh" onPress={this._refresh}/>
+             <View>
+                {/* <Button title="Refresh" onPress={this._refresh}/> */}
                 {
                     posts && posts ? posts.map((post, index) =>
                         <Post post={post} key={post.id} post_index={index}

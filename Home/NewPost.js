@@ -194,7 +194,7 @@ class NewPost extends Component{
                   {
                     ToastAndroid.show("Deleted");
                   }
-                }
+                })
                 .catch(e => {console.log("Error updating attachment", e)});
               }
           })

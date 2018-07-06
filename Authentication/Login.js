@@ -2,6 +2,8 @@ import React,{Component} from 'react'
 import { TextInput, StyleSheet, Text, View, Image,
     Button, Alert, StatusBar, AsyncStorage} from 'react-native';
 import { NavigationActions } from 'react-navigation';
+import { SecureStore } from "expo";
+// import  createMaterialTopTabNavigator  from "../Home/MainScreen";
 
 class LoginForm extends Component{
 
@@ -71,17 +73,17 @@ class LoginForm extends Component{
             if ('token' in myJson){
                 var base64 = require('base-64');
                 token = 'Basic ' + base64.encode(this.state.username + ":" + this.state.password);
-                navigate("Home",{auth:token, user_id:myJson.user});
-                // try{
-                //     AsyncStorage.setItem("user_auth",token).then(() =>{
-                //         AsyncStorage.setItem("user_id",myJson.user.toString()).then(() =>{
-                //             navigate('Home', {auth:token})
-                //         });
-                //     });
-                // }
-                // catch(error){
-                //     console.log(error);
-                // }                
+                SecureStore.setItemAsync("user_token",token)
+                .then((response) => {
+                    SecureStore.setItemAsync("user_id",myJson.user.toString())
+                    .then((resp) => {
+                        console.log("navigating to mainscreen");
+                        navigate("MainScreen");
+                    })                    
+                })
+                .catch(e => console.log("Error at securestore", e));
+                
+                // navigate("MainScreen",{auth:token, user_id:myJson.user});           
             }
             else{
                 Alert.alert("Invalid Credentials");
@@ -139,6 +141,16 @@ class LoginForm extends Component{
           </View>
         )
     }
-}
+
+    componentDidMount = () => {
+        SecureStore.getItemAsync("user_token")
+        .then((value) =>{
+            if(value !== null){
+                this.props.navigation.navigate("MainScreen");
+            }
+        })
+        .catch(e => console.log("Error", e));
+    }
+ }
 
 export default LoginForm

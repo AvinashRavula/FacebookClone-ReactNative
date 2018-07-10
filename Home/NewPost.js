@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
-import {Text, StyleSheet, View, Image, Button, Dimensions,
+import {Text, StyleSheet, View, Image, Dimensions,
    Alert, StatusBar, ScrollView, ToastAndroid, AsyncStorage} from 'react-native'
+import { Avatar, Button } from 'react-native-elements';
 import {DocumentPicker, ImagePicker, Video} from 'expo';
 import { TextInput } from 'react-native-gesture-handler';
 
@@ -14,6 +15,7 @@ const HOSTNAME =  BASE_LINK + "facebook/"
 const post_url = HOSTNAME + "posts/"
 const file_url = HOSTNAME + "files/"
 const MEDIA_URL = BASE_LINK + "media/"
+const fb_color = "#4267b2";
 
 class NewPost extends Component{
 
@@ -21,18 +23,24 @@ class NewPost extends Component{
       super(props);
     }
 
+    static navigationOptions = ({ navigation }) => {
+        const {navigate, state} = navigation;
+        return {
+            title: 'Create Post',
+            style:{color:'white'},
+            headerTitleStyle : {textAlign: 'center',alignSelf:'center', fontWeight:'normal', color:'white'},
+            headerStyle:{
+                backgroundColor:fb_color,
+            }
+        };
+    };
+
     state = {
         files: [],
         captions:'',
         tagged_ids:null,
         likes_ids:null,
-      };
-    // _pickDocument = async () => {
-    //       let result = await DocumentPicker.getDocumentAsync({type:'video/*'});
-    //         alert(result.uri);
-    //         this.setState({file:result.uri})
-    //         console.log(result);
-    //   }
+    };
 
      _pickImage = async () => {
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -40,9 +48,6 @@ class NewPost extends Component{
         aspect: [4, 4],
         mediaTypes:ImagePicker.MediaTypeOptions.Images
       });
-
-      // alert(result.uri);
-      // console.log(result)
 
       if (!result.cancelled) {
         let tempFiles = this.state.files;
@@ -250,25 +255,37 @@ class NewPost extends Component{
 
     render() {
            let { files } = this.state;
-           let {mode} = this.props.navigation.state.params;
+           let {mode, profilepicture, first_name, last_name} = this.props.navigation.state.params;
       return (
         // this.props.navigation.state.params.auth ?
         <View style={styles.container}>
           <ScrollView>
           <StatusBar hidden={false}/>
+            <View style={{flexDirection:'row', marginTop:15}}>
+                <View style={styles.dp}>
+                    { profilepicture ?         
+                        <Avatar small rounded 
+                                onPress={() => console.log("Works!")}
+                                source={require('../assets/facebook-logo-black-and-white-png-small.png')}
+                                activeOpacity={0.7}/>
+                        :   <Avatar small rounded 
+                                onPress={() => console.log("Works!")}
+                                source={require('../assets/facebook-logo-black-and-white-png-small.png')}
+                                activeOpacity={0.7}/>
+                    }
+                </View>
+                <Text style={{flex:4, fontWeight:'bold'}}>{first_name + " " + last_name}</Text>
+            </View>
             <TextInput multiline={true} defaultValue={this.state.captions}
-                style={{width:SCREEN_WIDTH-20,height:150}}
+                style={{width:SCREEN_WIDTH-20,height:150, fontSize:20, margin:10, marginTop:0}}
                 onChangeText={(text) => this.setState({captions:text})}
-                placeholder="Type something here.."/>
-            <View style={{flexDirection:'row',marginTop: 20}}>
+                placeholder="Whats on your mind.."/>
+            <View style={{flexDirection:'row',marginTop: 10, width:SCREEN_WIDTH, justifyContent:'center', alignItems:'center'}}>
+                <Button title="Add Image" onPress={this._pickImage} color={fb_color}
+                        backgroundColor="white" style={{flex:1}} />
                 <Button
-                  title= {"Add Video"}
-                  onPress={this._pickVideo}
-                />
-                <Text>    </Text>
-                <Button
-                  title={"Add Image"}
-                  onPress={this._pickImage}
+                  title={"Add Video"} color={fb_color} backgroundColor={"white"} 
+                  onPress={this._pickVideo} style={{flex:1}}
                 />
             </View>
             {/* <View style={{'margin': 20}}>        */}
@@ -279,16 +296,16 @@ class NewPost extends Component{
                   if (file.type.contains('image') && !file.deleted){
 
                     return (
-                      <View key={index} style={{margin:20}}>
+                      <View key={index} style={{margin:20, justifyContent:'center',alignItems:'center'}}>
                         <Button title="Delete" onPress={() => this.deleteFile(index)}/>
                         <Image source={{ uri: file.uri }}
-                          style={{width: 200, height: 200 }} />
+                          style={{width: SCREEN_WIDTH, height: SCREEN_WIDTH }} />
                       </View>
                     )
                   }
                   else if(file.type.contains('video') && !file.deleted){
                     return (
-                      <View key={index} style={{margin:20}}>
+                      <View key={index} style={{margin:20, justifyContent:'center',alignItems:'center'}}>
                         <Button title="Delete" onPress={() => this.deleteFile(index)}/>
                         <Video
                           source={{ uri: file.uri }}
@@ -297,7 +314,7 @@ class NewPost extends Component{
                           isMuted={false}
                           resizeMode="cover"
                           shouldPlay
-                          style={{width: 300, height: 300 }}
+                          style={{width: SCREEN_WIDTH, height: SCREEN_WIDTH }}
                         />
                       </View>
                      )
@@ -305,12 +322,14 @@ class NewPost extends Component{
                 }
               )
               }
+              <View style={{marginBottom:20}}>
               {
                 mode == 'Edit' ?
-                  <Button title="Update Post" onPress={this.updatePost}/>
+                  <Button title="Update Post" onPress={this.updatePost} backgroundColor={fb_color}/>
                   :
-                  <Button title="Add Post" onPress={this.upload}/>
+                  <Button title="Add Post" onPress={this.upload} backgroundColor={fb_color}/>
               }
+              </View>
           </ScrollView>
         </View>
       );
@@ -321,8 +340,12 @@ class NewPost extends Component{
     container: {
       flex: 1,
       backgroundColor: '#fff',
-      alignItems: 'center',
-      justifyContent: 'center',
+    },
+    dp:{
+        flex:1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin:0,
     },
   });
 

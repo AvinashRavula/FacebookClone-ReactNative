@@ -1,14 +1,25 @@
 import React, {Component} from 'react'
 import {View, StyleSheet, Button, StatusBar, ScrollView, Alert, TouchableHighlight,
-    Text, AsyncStorage, Image, TextInput} from 'react-native'
+    Text, AsyncStorage, Image, TextInput, Dimensions,ActivityIndicator,
+    FlatList } from 'react-native'
 import { SecureStore } from "expo";
 import AllPosts from './Posts';
 import { NavigationActions} from 'react-navigation';
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
-import { Avatar } from 'react-native-elements';
+import { Avatar, List, ListItem } from 'react-native-elements';
+import {OptimizedFlatList} from 'react-native-optimized-flatlist'
+import InfiniteScroll from 'react-native-infinite-scroll';
+import { Post } from "./Posts";
 // import { TextInput } from 'react-native-gesture-handler';
 
-const fb_color = '#4267b2';
+const IMAGE_SIZE = SCREEN_WIDTH - 80;
+const BASE_LINK = "http://192.168.0.5:8000/"
+const MEDIA_LINK = BASE_LINK + 'media/'
+const fb_color = "#4267b2";
+const HOSTNAME = BASE_LINK + "facebook/";
+const post_url = HOSTNAME + "posts/"
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export class HomeActivity extends Component{
 
@@ -16,117 +27,158 @@ export class HomeActivity extends Component{
     state = {
         user_token:null,
         user_id:null,
+        posts:[],
+        nextPage:null,
+        previousPage:null,
+        loading:false,
     }
     constructor(props){
         super(props);
         console.log("constructor");
         // this.intializeAsyncStorageValues();
     }
-    // state = {
-    //     auth:null,
-    // }
-    // static navigationOptions = ({ navigation }) => {
-    //     const {navigate, state} = navigation;
-    //     return {
-    //       title: 'Facebook Clone',
-    //       style:{color:'white'},
-    //       headerTitleStyle : {textAlign: 'center',alignSelf:'center', fontWeight:'normal', color:'white'},
-    //       headerStyle:{
-    //           backgroundColor:fb_color,
-    //       },
-    //       headerRight:
-    //           <Button title="Profile" onPress={() => navigate('Profile', {auth:state.params.auth})} />
-    //     };
-    // };
 
     _newPost= () =>
     {
         // console.log("new post : userid",state.params.user_id);
-        let {navigate, state} = this.props.navigation;
-        navigate('CreatePost', {mode:'Add', auth:state.params.auth, user_id:state.params.user_id});
+        let {user_token, user_id} = this.state;
+        let {navigate} = this.props.screenProps.rootNavigation;
+        navigate('CreatePost', {mode:'Add', auth:user_token, user_id:user_id});
     }
 
-    // intializeAsyncStorageValues = () => {
-    //     console.log("intializeAsyncStorageValues called");
-    //     let {navigate} = this.props.navigation;
-    //     AsyncStorage.multiGet('user_auth', 'user_id').then((auth, user_id)=>
-    //     {
-    //         console.log(auth, user_id);
-    //         if(auth !== null && user_id !== null)
-    //             this.setState({auth:auth, user_id:user_id})
-    //         else
-    //             navigate("Login");
-    //     });
-    // }
+    loadMorePosts = () => {
+        console.log("hey am being called");
+        this.fetchPosts(this.state.nextPage);
+    }
+    appendPosts = (new_posts) =>
+    {
+        let tempPosts = this.state.posts;
+        tempPosts = tempPosts.concat(new_posts);
+        this.setState({posts:tempPosts});
+    }
 
-    // componentDidUpdate = () =>{
-    //     console.log("componentDidUpdate");
-    //     this.intializeAsyncStorageValues();
-    // }
+    fetchPosts = (url) =>
+    {
+        
+        let {user_token} = this.state;
+        console.log("auth in fetch posts",user_token);
+        console.log(url);
+        if(url != null && user_token != null){
+            this.setState((prevState) => ({loading:true}));
+            fetch(url,{
+                method:'GET',
+                headers:{
+                    Authorization : user_token
+                }
+            })
+            .then(function(response){return response.json()})
+            .then((myJson) =>
+            {
+                console.log(myJson);
+                this.setState({
+                    nextPage:myJson.next,
+                    previousPage:myJson.previous,
+                });
+                this.appendPosts(myJson.results);
+                this.setState((prevState) => ({loading:false}));
+                // console.log(this.state.posts);
 
-    // _logout = () => {
-    //     let {navigate} = this.props.navigation;
-    //     console.log("Logout called");
-    //     AsyncStorage.multiRemove(['user_auth', 'user_id']).then((value) =>{
-    //         console.log("in asyncstorage");
-    //         navigate('Login');
-    //     });
-    // }
-    // render(){
-    //     let {auth, user_id} = this.props.navigation.state.params;
-    //     let {navigate} = this.props.navigation;
-    //     console.log("HomePage render auth : ",auth);
-    //     return (
-    //         <View style={styles.container}>
-    //             <StatusBar hidden={false}/>
-    //             { auth && <ScrollView>
-    //                 <View style={{flexDirection:'row'}}>
-                    
-    //                     <Button title="Add Post" onPress={this._newPost}/>
-    //                     <Button title="Explore Friends" 
-    //                         onPress={() => navigate('ExploreFriends', {auth:auth})} 
-    //                     />
-    //                     {/* <Button title="Logout" onPress={this._logout}/> */}
-    //                 </View> 
-    //                 <AllPosts auth={auth} user_id={user_id} navigate={navigate}/> 
-    //             </ScrollView> }
-    //         </View>
-    //     );
-    // }
+            })
+            .catch(e=>{
+                this.setState((prevState) => ({loading:false}));
+                console.log(e);
+                // Alert.alert("Error at Fetching");
+            })
+        }
+    }
+
+    _refresh = () =>
+    {
+        console.log("refreshing posts");
+        this.setState({posts:[]},this.fetchPosts(post_url));
+        // this.fetchPosts(post_url);
+    }
+
+    _updateLikes = (index, likes_ids) =>
+    {
+        let tempPosts = this.state.posts;
+        tempPosts[index].likes_ids = likes_ids
+        this.setState({posts: tempPosts});
+    }
+
+    renderHeader = () =>{
+        let {navigate} = this.props.screenProps.rootNavigation;
+        let {user_token} = this.state;
+        return (
+            <TouchableHighlight onPress={this._newPost} 
+                    underlayColor="#a8aeb5">
+                <View style={styles.status_container}>
+                    <View style={styles.dp}>
+                        <Avatar small rounded 
+                                onPress={() => navigate("Profile", {auth:user_token})}
+                                source={require('../assets/facebook-logo-black-and-white-png-small.png')}
+                                activeOpacity={0.7}/>
+                    </View>
+                    <View style={styles.status_input}>
+                        <Text style={{color:'#a8aeb5'}}>Write something here...</Text>
+                    </View>
+                    <View style={styles.photo_button}>
+                        <MaterialIcon size={30} name="photo-library" color="black"/>
+                    </View>
+                </View>
+            </TouchableHighlight>
+        );
+    }
+
+    renderFooter = () => {
+        if (!this.state.loading) return null;
+    
+        return (
+          <View
+            style={{
+              paddingVertical: 20,
+              borderTopWidth: 1,
+              borderColor: "#CED0CE"
+            }}
+          >
+            {/* <ActivityIndicator animating size="large" /> */}
+          </View>
+        );
+    };
+
+    onRefresh() {
+        console.log('refreshing')
+        // this.setState({ isFetching: true }, function() {
+        //     this.fetchData()
+        // });
+    }
 
     render(){
         let {user_token, user_id} = this.state;
-        let {navigate} = this.props.navigation;
+        let {navigate} = this.props.screenProps.rootNavigation;
         return(
             <View style={styles.container}>
-            <ScrollView>
                 <StatusBar hidden={false}/>
-                    <TouchableHighlight onPress={this._newPost} 
-                            underlayColor="#a8aeb5">
-                        <View style={styles.status_container}>
-                            <View style={styles.dp}>
-                                <Avatar small rounded 
-                                        onPress={() => console.log("Works!")}
-                                        source={require('../assets/facebook-logo-black-and-white-png-small.png')}
-                                        activeOpacity={0.7}/>
-                            </View>
-                            <View style={styles.status_input}>
-                                <Text style={{color:'#a8aeb5'}}>Write something here...</Text>
-                            </View>
-                            <View style={styles.photo_button}>
-                                <MaterialIcon size={30} name="photo-library" color="black"/>
-                                {/* <Avatar small 
-                                        onPress={() => console.log("Hey it works!")}
-                                        // source={require('../assets/facebook-logo-black-and-white-png-small.png')}
-                                        icon={{name:'photo-library'}}
-                                        activeOpacity={0.7}/> */}
-                            </View>
-                        </View>
-                    </TouchableHighlight>
-                    { user_token ? <View>
+                    { user_token ? 
+                        <OptimizedFlatList
+                            data={this.state.posts}
+                            renderItem={({ item, index }) => (
+                                <Post post={item} key={item.id} post_index={index}
+                                    user_id= {user_id} auth_token={user_token} navigate={navigate}
+                                    updateLikes={this._updateLikes}/>
+                            )}
+                            keyExtractor={item => item.id.toString()}
+                            ListHeaderComponent={this.renderHeader}
+                            ListFooterComponent={this.renderFooter}
+                            refreshing={this.state.loading}
+                            onRefresh={() => this._refresh()}
+                            onEndReached={this.loadMorePosts}
+                            onEndReachedThreshold={0}
+                    /> : <ActivityIndicator animating size="large" />}
+                    {/* { user_token ? <View>
                         <AllPosts auth={user_token} user_id={user_id} navigate={navigate}/> 
-                    </View> : <Text>Loading... the posts....</Text>}
-                </ScrollView>
+                    </View> : <Text>Loading... the posts....</Text>} */}
+                
             </View>
         );
     }
@@ -140,7 +192,11 @@ export class HomeActivity extends Component{
                 .then((user_id) => {
                     console.log("value for user_id is ", user_id);
                     if(user_id !== null){
-                        this.setState({user_token: user_token, user_id: parseInt(user_id)});
+                        this.setState((prevState) => ({
+                            user_token: user_token,
+                            user_id: parseInt(user_id)
+                        })); 
+                        this._refresh();
                     }
                 })
             }

@@ -66,7 +66,7 @@ const MainScreenTabNavigator = createMaterialTopTabNavigator({
 	});
 
 
-export const ClickableIcon = (props) => {
+const ClickableIcon = (props) => {
 	return(
 		<View style={{margin:10}}>
 			<Icon size={30} name={props.name} color={props.color} />
@@ -103,7 +103,7 @@ export class MainScreenActivity extends React.Component{
 	render(){
 		console.log("rendering...");
 		return (
-				<MainScreenTabNavigator/>
+				<MainScreenTabNavigator screenProps={{rootNavigation: this.props.navigation}}/>
 		);
 	}
 }

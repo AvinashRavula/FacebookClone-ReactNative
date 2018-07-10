@@ -4,7 +4,7 @@ import { Sae, Avi } from 'react-native-textinput-effects';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 const fb_color = '#3B5998';
-const auth_key = "Basic YXZpbmFzaDpyYXZ1bGExMjI5"
+const auth_key = "Basic YXZpbmFzaDpyYXZ1bGFAMTIyOQ=="
 
 class ForgotPasswordForm extends Component{
 

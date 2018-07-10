@@ -15,7 +15,7 @@ import {NavigationActions} from 'react-navigation';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const fb_color="#3B5988";
+const fb_color = "#4267b2";
 const HOSTNAME = "http://192.168.0.5:8000/facebook/";
 
 const LabelValue = (props) => {
@@ -39,6 +39,18 @@ export class ProfileActivity extends Component{
     state = {
         loaded:false,
     }
+
+    static navigationOptions = ({ navigation }) => {
+        const {navigate, state} = navigation;
+        return {
+            title: 'Profile',
+            style:{color:'white'},
+            headerTitleStyle : {textAlign: 'center',alignSelf:'center', fontWeight:'normal', color:'white'},
+            headerStyle:{
+                backgroundColor:fb_color,
+            }
+        };
+    };
 
     componentDidMount(){
         const {auth} = this.props.navigation.state.params;
@@ -117,7 +129,7 @@ export class ProfileActivity extends Component{
     // pictureType defines the Cover picture or Profile Picture
     uploadPicture = (pictureType) =>
     {
-        let { cp_request_method, cp, dp, profile_id} = this.state;
+        let { cp_request_method, dp_request_method, cp, dp, profile_id} = this.state;
         let {auth} = this.props.navigation.state.params;
         let url = HOSTNAME;
         let request_method = "PUT";
@@ -177,6 +189,7 @@ export class ProfileActivity extends Component{
         let {cp, dp, first_name, last_name, email, dob, phonenum, profile_id} = this.state;
         let {navigate} = this.props.navigation;
         let {auth} = this.props.navigation.state.params;
+        console.log(cp);
         return(
             this.state.loaded? this.state.error ? <Text> Error in getting the data</Text> : 
             <ScrollView>
@@ -184,22 +197,23 @@ export class ProfileActivity extends Component{
                     <TouchableHighlight onPress={() => this._changePicture('cover', [4,2])}>
                         { cp ? 
                             <Image source={{uri: cp.image}} 
-                                style={{width:SCREEN_WIDTH, height:200, marginTop:30, backgroundColor:'red'}}/>
+                                style={{width:SCREEN_WIDTH, height:200, marginTop:0,backgroundColor:'green'}}/>
                         :
-                        <Image source={ require('../assets/fb_icon_small.png')} 
-                                style={{width:SCREEN_WIDTH, height:200, marginTop:30, backgroundColor:'red'}}/>
+                            <Image source={ require('../assets/fb_icon_small.png')} 
+                                style={{width:SCREEN_WIDTH, height:200, marginTop:0}}/>
                         }
                     </TouchableHighlight> 
-                    <TouchableHighlight onPress={() => this._changePicture('profile', [2,2])}>
+                    <TouchableHighlight onPress={() => this._changePicture('profile', [2,2])}
+                                    style={{justifyContent:'center', alignItems:'center'}}>
                         { dp ? 
                             <Image source={{uri: dp.image}} 
-                                style={{width:200, height:200, marginTop:30, backgroundColor:'green'}}/>
-                        :
-                        <Image source={ require('../assets/fb_icon_small.png')} 
-                                style={{width:200, height:200, marginTop:30, backgroundColor:'green'}}/>
+                                style={{width:150, height:150, marginTop:0, backgroundColor:'green'}}/>
+                            :
+                            <Image source={ require('../assets/fb_icon_small.png')} 
+                                style={{width:150, height:150, marginTop:0, backgroundColor:'green'}}/>
                         }
                     </TouchableHighlight>
-                    <View style={{marginHorizontal :40,}}>
+                    <View style={{marginHorizontal :40,marginTop:20}}>
                         <LabelValue label="First Name:" 
                                     value={first_name}/>
                         <LabelValue label="Last Name:" 

@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, Alert, Route, StatusBar, AsyncStorage } from 'r
 import LoginForm from './Authentication/Login';
 import SignupForm from './Authentication/Signup';
 import ForgotPasswordForm from './Authentication/ForgotPassword';
+import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
 import Home from './Home/NewPost';
 import { Switch } from 'react-native-gesture-handler';
 import {
@@ -22,17 +23,8 @@ import {NotificationActivity} from './Home/Notification';
 import { MenuActivity } from "./Home/Menu";
 import {createMaterialTopTabNavigator} from 'react-navigation';
 import { MainScreenActivity } from './Home/MainScreen';
-import Icon from 'react-native-vector-icons/FontAwesome';
-
-
-/* FontAwesome Packages*/
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faStroopwafel } from '@fortawesome/free-solid-svg-icons'
-
-library.add(faStroopwafel)
-
-/* FontAwesome Packages */ 
+import {StartUpScreen} from './Home/StartUpScreen';
+import Icon from 'react-native-vector-icons/FontAwesome'; 
 
 const LoginAuthContext = React.createContext(null);
 const LoginUserIdContext = React.createContext(null);
@@ -44,8 +36,25 @@ export default class App extends React.Component {
 		isLoggedIn : false,
 	}
 
+	_menu = null;
+ 
+	setMenuRef = ref => {
+        console.log("setMenuRef");
+        this._menu = ref;
+    };
+    
+    hideMenu = () => {
+        console.log("hideMenu");
+        this._menu.hide();
+    };
+    
+    showMenu = () => {
+        console.log("showMenu");
+        this._menu.show();
+    };
+
 	MyRoute = createStackNavigator({
-		
+		StartScreen:{ screen:StartUpScreen},
 		Login:  { screen: LoginForm },
 		Signup: { screen: SignupForm },
 		ForgotPassword : {screen: ForgotPasswordForm},
@@ -76,6 +85,20 @@ export default class App extends React.Component {
 			<LoginAuthContext.Provider>
 				<this.MyRoute/>
 			</LoginAuthContext.Provider>
+			// <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+			// 	<Menu
+			// 	ref={this.setMenuRef}
+			// 	button={<Text onPress={this.showMenu}>Show menu</Text>}
+			// 	>
+			// 		<MenuItem onPress={this.hideMenu}>Menu item 1</MenuItem>
+			// 		<MenuItem onPress={this.hideMenu}>Menu item 2</MenuItem>
+			// 		<MenuItem onPress={this.hideMenu} disabled>
+			// 			Menu item 3
+			// 		</MenuItem>
+			// 		<MenuDivider />
+			// 		<MenuItem onPress={this.hideMenu}>Menu item 4</MenuItem>
+			// 	</Menu>
+			// </View>
     );
   }
 }

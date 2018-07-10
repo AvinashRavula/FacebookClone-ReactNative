@@ -14,7 +14,7 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 const HOSTNAME = "http://192.168.0.5:8000/facebook/"
-const auth_key = "Basic YXZpbmFzaDpyYXZ1bGExMjI5"
+const auth_key = "Basic YXZpbmFzaDpyYXZ1bGFAMTIyOQ=="
 
 class SignupForm extends Component{
 

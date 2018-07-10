@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, StyleSheet, Image, Text, ScrollView, Button,
     ToastAndroid} from 'react-native';
-import {AsyncStorage} from 'react-native';
+import { SecureStore } from "expo";
 
 const HOSTNAME = "http://192.168.0.5:8000/facebook/"
 
@@ -13,7 +13,8 @@ class UserRequest extends React.Component{
   }
   styles = StyleSheet.create({
     row_container:{
-      flexDirection:'row'
+      flexDirection:'row',
+      marginTop:10,
     },
     profile_picture:{
       width:100,
@@ -74,15 +75,15 @@ class UserRequest extends React.Component{
             <Image source={{uri:user.profilepicture}} style={this.styles.profile_picture}/>
           : <Image source={require('../assets/user_icon.png')} style={this.styles.profile_picture}/>
         }
-        <View style={{justifyContent:'center'}}>
+        <View style={{margin:10}}>
           <Text style={this.styles.user_name}>{user.first_name + " " + user.last_name}</Text>
             { this.state.accepted ?
                 <View>
-                  <Text>You are now friends</Text>
+                  <Text style={{marginTop:10}}>You are now friends</Text>
                   <Button title="Unfriend" onPress={this._cancelRequest}/>
                 </View>
                  :
-                <View style={this.styles.row_container}>
+                <View style={[this.styles.row_container,{marginTop:30}]}>
                   <Button title="Confirm" onPress={this._confirmFriend}/>
                   <Button title="Cancel" onPress={this._cancelRequest}/>
                 </View>
@@ -101,8 +102,6 @@ class AllFriendRequests extends React.Component{
   styles = StyleSheet.create({
       container:{
         flexDirection:'row',
-        justifyContent:'center',
-        alignItems:'center'
       }
   });
 
@@ -124,7 +123,7 @@ class AllFriendRequests extends React.Component{
               return <UserRequest user={user} auth={auth}
                     onRemove={() => this._remove(index)} key={user.id}/>
             })
-            : <Text>No New Requests</Text>
+            : <Text style={{marginTop:20, marginBottom:10}}>No New Requests</Text>
         }
       </View>
     );
@@ -196,7 +195,7 @@ class FriendRequest extends React.Component{
     let {auth} = this.props;
     return(
       <View style={this.styles.container}>
-        <Text>FRIEND REQUESTS</Text>
+        <Text style={{margin:10, fontWeight:'bold'}}>FRIEND REQUESTS</Text>
         <AllFriendRequests auth={auth}/>
       </View>
     );
@@ -271,22 +270,22 @@ class User extends React.Component{
             <Image source={{uri:user.profilepicture}} style={this.styles.profile_picture}/>
           : <Image source={require('../assets/user_icon.png')} style={this.styles.profile_picture}/>
         }
-        <View style={{justifyContent:'center'}}>
+        <View style={{margin:10}}>
           <Text style={this.styles.user_name}>{user.first_name + " " + user.last_name}</Text>
-          <View style={this.styles.row_container}>
             { this.state.requested ?
-                <View>
-                  <Text>Request Sent</Text>
-                  <Button title="Cancel Request" onPress={this._cancelRequest}/>
+                <View style={[this.styles.row_container,{marginTop:10}]}>
+                  <Text style={{flex:1}}>Request Sent</Text>
+                  <View style={{flex:1}}></View>
+                  <Button title="Cancel Request" onPress={this._cancelRequest}
+                          style={{flex:1}}/>
                 </View>
                  :
-                <View>
-                  <Button title="Add Friend" onPress={this._addFriend}/>
-                  <Button title="Remove" onPress={onRemove}/>
+                <View style={[this.styles.row_container,{marginTop:10}]}>
+                  <Button title="Add Friend" onPress={this._addFriend} 
+                          style={{flex:1}}/>
+                  <Button title="Remove" onPress={onRemove} style={{flex:1}}/>
                 </View>
             }
-
-          </View>
         </View>
       </View>
     );
@@ -317,7 +316,7 @@ class PeopleYouMayKnow extends React.Component{
     console.log(this.state.users);
     return(
       <View style={this.styles.container}>
-        <Text>PEOPLE YOU MAY KNOW</Text>
+        <Text style={{margin:10,fontWeight:'bold'}}>PEOPLE YOU MAY KNOW</Text>
         <View>
         { 
             auth && users.map((user, index) =>{
@@ -372,6 +371,10 @@ class PeopleYouMayKnow extends React.Component{
 
 export class Explore_Friends extends React.Component{
 
+  state = {
+    user_token:null,
+  }
+
   styles = StyleSheet.create({
     container:{
       flex:1,
@@ -379,19 +382,33 @@ export class Explore_Friends extends React.Component{
     }
   });
 
+
   render(){
     // let {auth} = this.props.navigation.state.params;
     // console.log(auth);
+    let {user_token} = this.state;
     return(
       <ScrollView>
-        <View style={this.styles.container}>
-          <Text>Explore_Friends</Text>
-          {/* <FriendRequest auth={auth}/>
-          <View style={{marginTop:30}}>
-            <PeopleYouMayKnow auth={auth} style={{marginTop:30}}/>
-          </View> */}
-        </View>
+        { this.state.user_token ? <View style={this.styles.container}>
+          <FriendRequest auth={user_token}/>
+          <View style={{marginTop:20}}>
+            <PeopleYouMayKnow auth={user_token} style={{marginTop:30}}/>
+          </View>
+        </View> : null }
       </ScrollView>
     );
   }
+
+  componentDidMount = () =>{
+    SecureStore.getItemAsync("user_token")
+    .then((user_token) => {
+        console.log("value for user_token is ",user_token);
+        if(user_token !== null){
+            this.setState((prevState) => ({
+              user_token: user_token
+            }))
+        }
+    })
+    .catch(e => console.log("error at getting secure store", e));
+}
 }

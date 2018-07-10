@@ -1,12 +1,13 @@
 import React, {Component} from 'react'
-import {Alert, View, Text, Image, Dimensions, Button, AsyncStorage} from'react-native'
+import {Alert, View, Text, Image, Dimensions, AsyncStorage} from'react-native'
 import {Video} from 'expo';
 
 import { NavigationActions } from 'react-navigation';
 import { Sae } from 'react-native-textinput-effects';
-import { TextInput } from 'react-native-gesture-handler';
-import { Avatar } from 'react-native-elements';
-import { ClickableIcon } from "./MainScreen";
+import { TextInput, FlatList } from 'react-native-gesture-handler';
+import { Avatar, Button } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
 
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -15,35 +16,60 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 const IMAGE_SIZE = SCREEN_WIDTH - 80;
 const BASE_LINK = "http://192.168.0.5:8000/"
 const MEDIA_LINK = BASE_LINK + 'media/'
-const fb_color = '#3B5998';
+const fb_color = "#4267b2";
 const HOSTNAME = BASE_LINK + "facebook/";
 const post_url = HOSTNAME + "posts/"
 
-const Attachment = (props) =>
-{
+const ClickableIcon = (props) => {
+	return(
+		<View style={{margin:10}}>
+			<Icon size={30} name={props.name} color={props.color} />
+		</View>
+	);
+}
+
+class Attachment extends Component{
+    
     // console.log(props);
     // console.log("Link ",link);
-    const attachment = props.item;
-    if(attachment.type.contains('image'))
-    {
-        return(
-                <Image source={{uri:attachment.file}} style={{width:200,height:200}}/>
-        );
+    videoRef = null;
+    state= {
+        shouldPlayVideo:false
     }
-    else{
-        return(
-                <Video source={{uri:attachment.file}} rate={1.0}
-                  volume={1.0}
-                  isMuted={false}
-                  resizeMode="cover"
-                //   shouldPlay
-                  style={{ width: 300, height: 300 }}/>
-        );
+
+    onReady = () =>{
+        console.log("onready");
+        this.setState({shouldPlayVideo:true});
+    }
+
+    
+
+    render(){
+        let attachment = this.props.item;
+       return(
+        attachment.type.contains('image') ?
+            <Image source={{uri:attachment.file}} style={{width:SCREEN_WIDTH, height:SCREEN_WIDTH}}/> 
+            :
+            <Video source={{uri:attachment.file}} rate={1.0}
+                    ref={
+                        r => this.videoRef = r
+                    }
+                    volume={1.0}
+                    isMuted={false}
+                    resizeMode="cover"
+                    useNativeControls
+                    isLooping
+                    // shouldPlay={this.state.shouldPlayVideo}
+                    // onReadyForDisplay={
+                    //     this.onReady
+                    // }
+                    style={{ width: SCREEN_WIDTH, height: SCREEN_WIDTH }}/>
+       );
     }
 }
 
 
-class Post extends Component{
+export class Post extends Component{
     constructor(props){
         super(props);
     }
@@ -53,6 +79,22 @@ class Post extends Component{
         comment_text:""
     }
 
+    _menu = null;
+    
+    setMenuRef = ref => {
+        console.log("setMenuRef");
+        this._menu = ref;
+    };
+    
+    hideMenu = () => {
+        console.log("hideMenu");
+        this._menu.hide();
+    };
+    
+    showMenu = () => {
+        console.log("showMenu");
+        this._menu.show();
+    };
 
     _like_unlike = (operation) =>
     {
@@ -117,13 +159,14 @@ class Post extends Component{
         }).catch(e=> console.log(e));
     }
 
-    _share = () =>
+    _share = () =>  
     {
-        Alert.alert("Oops! Our developers are adding this feature");
+        Alert.alert("Oops! This feature is under development");
     }
 
     _deletePost = () =>
     {
+        this.hideMenu();
         let {post, auth_token} = this.props;
         fetch(post_url + post.id + '/' ,{
             method:'delete',
@@ -137,6 +180,7 @@ class Post extends Component{
 
     _editPost = () =>
     {
+        this.hideMenu();
         let {auth_token, navigate} = this.props;
         navigate('CreatePost',{post_id:this.props.post.id, mode:'Edit', auth:auth_token});
     }
@@ -154,7 +198,7 @@ class Post extends Component{
                                 onPress={this._editPost}/>
                 </View> */}
                 <View style={{flexDirection:'row', margin:10}}>
-                    <View style={{flex:1}}>
+                    <View style={{flex:1, marginLeft:10,marginTop:5}}>
                         <Avatar small rounded 
                                 onPress={() => console.log("Works!")}
                                 source={require('../assets/facebook-logo-black-and-white-png-small.png')}
@@ -164,13 +208,24 @@ class Post extends Component{
                         <Text style={{fontWeight:'bold', color:fb_color}}>{post.first_name} {post.last_name} </Text>
                         {post.tagged_ids ? <Text>is with { post.tagged_ids}</Text> : <Text> added a new post</Text>}
                     </View>
-                    <View style={{flex:1}}>
-                        <ClickableIcon name="camera" color="white"/>,
+                    <View style={{flex:0.5, height:10, justifyContent:'center', alignItems:'center'}}>
+                    {/* <ClickableIcon name="ellipsis-h" color="black" onPress={this.showMenu}/> */}
+                    {/* <Button icon={{name: 'ellipsis-h', type: 'font-awesome', size:30, color:'black'}}  */}
+                                    {/* // backgroundColor="white" style={{width:70,height:15,padding:0, margin:0}} onPress={this.showMenu}/> */}
+                        <Menu
+                            ref={this.setMenuRef}
+                            button={ <Text onPress={this.showMenu} 
+                                        style={{fontSize:40}}>...</Text>}>
+                                <MenuItem onPress={this._editPost}>Edit</MenuItem>
+                                <MenuItem onPress={this._deletePost}>Delete</MenuItem>
+                        </Menu>
                     </View>
                 </View>
-                
-                
-                <Text style={{fontSize:20}}>{post.captions}</Text>
+                {/* <Text style={{fontWeight:'bold', color:fb_color}}>{post.first_name} {post.last_name} </Text>
+                {post.tagged_ids ? <Text>is with { post.tagged_ids}</Text> : <Text> added a new post</Text>} */}
+                <View style={{margin:10}}>
+                    <Text style={{fontSize:20}}>{post.captions}</Text>
+                </View>
                 {
                     post.attachments.map((attachment) =>
                     {
@@ -178,11 +233,23 @@ class Post extends Component{
                     })
 
                 }
-               <View style={{flexDirection:'row',flex:1}}>
-                    { like_state?  <Button title="Unlike" onPress={() => this._like_unlike(0)}/>
-                                :  <Button title="Like" onPress={() => this._like_unlike(1)}/> }
-                    <Button title="Comment" onPress={this._showCommentBox}/>
-                    <Button title="Share" onPress={this._share}/>
+               <View style={{flexDirection:'row', borderBottomColor:'#a8aeb5', borderTopColor:'#a8aeb5', borderWidth:1}}>
+                    <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+                        { like_state?  <Button title="Like" onPress={() => this._like_unlike(0)}
+                                            color="#3578e5" backgroundColor="white"
+                                            icon={{name: 'thumbsup', type: 'octicon', color:'#3578e5'}}/>
+                                :  <Button title="Like" onPress={() => this._like_unlike(0)}
+                                        color="black" backgroundColor="white"
+                                        icon={{name: 'thumbsup', type: 'octicon', color:'black'}}/> }
+                    </View>
+                    <View style={{flex:1}}>
+                        <Button title="Comment" color="black" backgroundColor="white"
+                             onPress={this._showCommentBox} icon={{name: 'comment', type: 'octicon', color:'black'}}/>
+                    </View>
+                    <View style={{flex:1}}>
+                        <Button title="Share" onPress={this._share} color="black"
+                                 backgroundColor="white" icon={{name: 'share', type: 'font-awesome', color:'black'}}/>
+                    </View>
                 </View>
                 { this.state.showCommentBox && this.state.showCommentBox ?
                     <View>
@@ -215,7 +282,7 @@ class Post extends Component{
 // }
 
 
-export default class AllPosts extends Component{
+export class AllPosts extends Component{
 
     state = {
         posts:[],
@@ -234,6 +301,7 @@ export default class AllPosts extends Component{
     {
         let {auth} = this.props;
         console.log("auth in fetch posts",auth);
+        console.log(url);
         fetch(url,{
             method:'GET',
             headers:{
@@ -274,6 +342,8 @@ export default class AllPosts extends Component{
         this.setState({posts: tempPosts});
     }
 
+    
+
     render(){
         let {posts} = this.state;
         let {user_id, auth, navigate} = this.props;
@@ -287,6 +357,7 @@ export default class AllPosts extends Component{
             // </View>
              <View>
                 {/* <Button title="Refresh" onPress={this._refresh}/> */}
+                
                 {
                     posts && posts ? posts.map((post, index) =>
                         <Post post={post} key={post.id} post_index={index}

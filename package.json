@@ -34,7 +34,11 @@
     "react-native-datepicker-dialog": "0.0.9",
     "react-native-desktop": "^0.6.5",
     "react-native-elements": "^0.19.1",
+    "react-native-infinite-scroll": "^1.0.6",
+    "react-native-infinite-scroll-view": "^0.4.3",
+    "react-native-material-menu": "^0.3.1",
     "react-native-multiple-select": "^0.4.4",
+    "react-native-optimized-flatlist": "^1.0.4",
     "react-native-textinput-effects": "^0.4.2",
     "react-navigation": "^2.5.5"
   }

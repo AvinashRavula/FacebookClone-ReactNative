@@ -1,5 +1,15 @@
 {
   "expo": {
-    "sdkVersion": "27.0.0"
+    "sdkVersion": "27.0.0",
+    "name": "Swagbook",
+    "icon": "./assets/fb_white_icon_small.png",
+    "version": "1.0.0",
+    "slug": "my-app-slug",
+    "ios": {
+      "bundleIdentifier": "com.avinash.swagbook"
+    },
+    "android": {
+      "package": "com.avinash.swagbook"
+    }
   }
 }

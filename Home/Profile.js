@@ -16,7 +16,7 @@ import {NavigationActions} from 'react-navigation';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const fb_color = "#4267b2";
-const HOSTNAME = "http://192.168.0.5:8000/facebook/";
+const HOSTNAME = "https://swagbook-django.herokuapp.com/facebook/";
 
 const LabelValue = (props) => {
     LabelValue.defaultProps = {
@@ -186,9 +186,9 @@ export class ProfileActivity extends Component{
 
 
     render(){
-        let {cp, dp, first_name, last_name, email, dob, phonenum, profile_id} = this.state;
-        let {navigate} = this.props.navigation;
-        let {auth} = this.props.navigation.state.params;
+        // let {cp, dp} = this.state;
+        let {cp, dp, first_name, last_name, email, dob, phonenum,
+                relationship_status, languages_known} = this.props.navigation.state.params;
         console.log(cp);
         return(
             this.state.loaded? this.state.error ? <Text> Error in getting the data</Text> : 
@@ -224,6 +224,10 @@ export class ProfileActivity extends Component{
                                     value={email}/>
                         <LabelValue label="Phone Number:" 
                                     value={phonenum}/>
+                        <LabelValue label="Relationship status:" 
+                                    value={relationship_status}/>
+                        <LabelValue label="Languages Known:" 
+                                    value={languages_known}/>
                         {/* <Button title="Edit" onPress={() => navigate('EditProfile',{
                             dp:dp, cp:cp, first_name:first_name,
                             last_name:last_name, dob: dob,

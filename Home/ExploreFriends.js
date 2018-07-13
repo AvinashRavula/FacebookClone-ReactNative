@@ -3,7 +3,7 @@ import {View, StyleSheet, Image, Text, ScrollView, Button,
     ToastAndroid} from 'react-native';
 import { SecureStore } from "expo";
 
-const HOSTNAME = "http://192.168.0.5:8000/facebook/"
+const HOSTNAME = "https://swagbook-django.herokuapp.com/facebook/"
 
 
 class UserRequest extends React.Component{
@@ -202,14 +202,15 @@ class FriendRequest extends React.Component{
   }
 }
 
-class User extends React.Component{
+export class User extends React.Component{
 
   state= {
     requested:false,
   }
   styles = StyleSheet.create({
     row_container:{
-      flexDirection:'row'
+      flexDirection:'row',
+      margin:10,
     },
     profile_picture:{
       width:100,
@@ -321,7 +322,7 @@ class PeopleYouMayKnow extends React.Component{
         { 
             auth && users.map((user, index) =>{
                 return <User user={user} key={user.id} auth={auth}
-                             onRemove={() => this._remove(index)} key={user.id} />
+                             onRemove={() => this._remove(index)} />
             })
         }
         </View>

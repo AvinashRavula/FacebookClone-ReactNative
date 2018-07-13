@@ -10,7 +10,7 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 const IMAGE_SIZE = SCREEN_WIDTH - 80;
-const BASE_LINK = "http://192.168.0.5:8000/"
+const BASE_LINK = "https://swagbook-django.herokuapp.com/"
 const HOSTNAME =  BASE_LINK + "facebook/"
 const post_url = HOSTNAME + "posts/"
 const file_url = HOSTNAME + "files/"
@@ -79,7 +79,7 @@ class NewPost extends Component{
     {
       // if(this.state.image == null)
       // console.log("user_id", this.props.navigation.state.params.user_id);
-      let {auth, user_id} = this.props.navigation.state.params;
+      let {auth} = this.props.navigation.state.params;
       // postFormData.append('user',user_id);
       fetch(post_url, {
         method:'post',
@@ -263,15 +263,14 @@ class NewPost extends Component{
           <StatusBar hidden={false}/>
             <View style={{flexDirection:'row', marginTop:15}}>
                 <View style={styles.dp}>
-                    { profilepicture ?         
-                        <Avatar small rounded 
-                                onPress={() => console.log("Works!")}
-                                source={require('../assets/facebook-logo-black-and-white-png-small.png')}
-                                activeOpacity={0.7}/>
-                        :   <Avatar small rounded 
-                                onPress={() => console.log("Works!")}
-                                source={require('../assets/facebook-logo-black-and-white-png-small.png')}
-                                activeOpacity={0.7}/>
+                    { profilepicture ? <Avatar small rounded 
+                                          onPress={() => console.log("Works!")}
+                                          source={{uri:profilepicture}}
+                                          activeOpacity={0.7}/>
+                                    :   <Avatar small rounded 
+                                          onPress={() => console.log("Works!")}
+                                          source={require('../assets/facebook-logo-black-and-white-png-small.png')}
+                                          activeOpacity={0.7}/>
                     }
                 </View>
                 <Text style={{flex:4, fontWeight:'bold'}}>{first_name + " " + last_name}</Text>
@@ -280,7 +279,7 @@ class NewPost extends Component{
                 style={{width:SCREEN_WIDTH-20,height:150, fontSize:20, margin:10, marginTop:0}}
                 onChangeText={(text) => this.setState({captions:text})}
                 placeholder="Whats on your mind.."/>
-            <View style={{flexDirection:'row',marginTop: 10, width:SCREEN_WIDTH, justifyContent:'center', alignItems:'center'}}>
+            <View style={{flexDirection:'row',marginTop: 0, marginBottom:10, width:SCREEN_WIDTH, justifyContent:'center', alignItems:'center'}}>
                 <Button title="Add Image" onPress={this._pickImage} color={fb_color}
                         backgroundColor="white" style={{flex:1}} />
                 <Button
@@ -314,6 +313,7 @@ class NewPost extends Component{
                           isMuted={false}
                           resizeMode="cover"
                           shouldPlay
+                          useNativeControls
                           style={{width: SCREEN_WIDTH, height: SCREEN_WIDTH }}
                         />
                       </View>

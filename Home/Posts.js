@@ -14,7 +14,7 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 const IMAGE_SIZE = SCREEN_WIDTH - 80;
-const BASE_LINK = "http://192.168.0.5:8000/"
+const BASE_LINK = "https://swagbook-django.herokuapp.com/"
 const MEDIA_LINK = BASE_LINK + 'media/'
 const fb_color = "#4267b2";
 const HOSTNAME = BASE_LINK + "facebook/";
@@ -51,9 +51,6 @@ class Attachment extends Component{
             <Image source={{uri:attachment.file}} style={{width:SCREEN_WIDTH, height:SCREEN_WIDTH}}/> 
             :
             <Video source={{uri:attachment.file}} rate={1.0}
-                    ref={
-                        r => this.videoRef = r
-                    }
                     volume={1.0}
                     isMuted={false}
                     resizeMode="cover"
@@ -127,7 +124,7 @@ export class Post extends Component{
 
     _showCommentBox = () =>
     {
-        this.setState({showCommentBox:true});
+        this.setState((prevState) => ({showCommentBox:!prevState.showCommentBox}));
     }
 
     _comment = () =>
@@ -199,30 +196,33 @@ export class Post extends Component{
                 </View> */}
                 <View style={{flexDirection:'row', margin:10}}>
                     <View style={{flex:1, marginLeft:10,marginTop:5}}>
-                        <Avatar small rounded 
-                                onPress={() => console.log("Works!")}
-                                source={require('../assets/facebook-logo-black-and-white-png-small.png')}
-                                activeOpacity={0.7}/>
+                    {
+                        post.profile_picture ? 
+                                <Avatar small rounded 
+                                        onPress={() => console.log("Works!")}
+                                        source={{uri:MEDIA_LINK + post.profile_picture }}
+                                        activeOpacity={0.7}/>
+                                :
+                                <Avatar small rounded 
+                                        onPress={() => console.log("Works!")}
+                                        source={require('../assets/facebook-logo-black-and-white-png-small.png')}
+                                        activeOpacity={0.7}/>
+                    }
                     </View>
                     <View style={{flex:3}}>
                         <Text style={{fontWeight:'bold', color:fb_color}}>{post.first_name} {post.last_name} </Text>
                         {post.tagged_ids ? <Text>is with { post.tagged_ids}</Text> : <Text> added a new post</Text>}
                     </View>
                     <View style={{flex:0.5, height:10, justifyContent:'center', alignItems:'center'}}>
-                    {/* <ClickableIcon name="ellipsis-h" color="black" onPress={this.showMenu}/> */}
-                    {/* <Button icon={{name: 'ellipsis-h', type: 'font-awesome', size:30, color:'black'}}  */}
-                                    {/* // backgroundColor="white" style={{width:70,height:15,padding:0, margin:0}} onPress={this.showMenu}/> */}
-                        <Menu
+                    { post.user == user_id ? <Menu
                             ref={this.setMenuRef}
                             button={ <Text onPress={this.showMenu} 
                                         style={{fontSize:40}}>...</Text>}>
                                 <MenuItem onPress={this._editPost}>Edit</MenuItem>
                                 <MenuItem onPress={this._deletePost}>Delete</MenuItem>
-                        </Menu>
+                        </Menu> : null }
                     </View>
                 </View>
-                {/* <Text style={{fontWeight:'bold', color:fb_color}}>{post.first_name} {post.last_name} </Text>
-                {post.tagged_ids ? <Text>is with { post.tagged_ids}</Text> : <Text> added a new post</Text>} */}
                 <View style={{margin:10}}>
                     <Text style={{fontSize:20}}>{post.captions}</Text>
                 </View>
@@ -233,12 +233,20 @@ export class Post extends Component{
                     })
 
                 }
+                <View style={{flexDirection:'row',alignItems:'flex-start', margin:10}}>
+                    <Text style={{flex:1, marginLeft:10}}>
+                    { post.likes_ids ? post.likes_ids.split(",").length + " Likes" : "Be the first to like"}
+                    </Text>
+                    <View style={{flex:1,alignItems:'flex-end'}}>
+                        <Text style={{marginRight:10}}>{post.comments ? post.comments.length + " Comments" : "No Comments"}</Text>
+                    </View>
+                </View>
                <View style={{flexDirection:'row', borderBottomColor:'#a8aeb5', borderTopColor:'#a8aeb5', borderWidth:1}}>
                     <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
                         { like_state?  <Button title="Like" onPress={() => this._like_unlike(0)}
                                             color="#3578e5" backgroundColor="white"
                                             icon={{name: 'thumbsup', type: 'octicon', color:'#3578e5'}}/>
-                                :  <Button title="Like" onPress={() => this._like_unlike(0)}
+                                :  <Button title="Like" onPress={() => this._like_unlike(1)}
                                         color="black" backgroundColor="white"
                                         icon={{name: 'thumbsup', type: 'octicon', color:'black'}}/> }
                     </View>
@@ -252,12 +260,12 @@ export class Post extends Component{
                     </View>
                 </View>
                 { this.state.showCommentBox && this.state.showCommentBox ?
-                    <View>
+                    <View style={{marginBottom:10}}>
                         <TextInput placeholder="Enter Comment" underlineColorAndroid="transparent"
                                 onChangeText={(text) => this.setState({comment_text:text})}
                                 style={{color : 'black', paddingBottom : 10,
                                         fontSize : 16, margin:10,}}/>
-                        <Button title="Add Comment" onPress={this._comment}/>
+                        <Button title="Add Comment" onPress={this._comment} backgroundColor={fb_color} color="white"/>
                     </View> : null }
             </View>
 

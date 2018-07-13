@@ -13,7 +13,7 @@ import MultiSelect from 'react-native-multiple-select';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-const HOSTNAME = "http://192.168.0.5:8000/facebook/"
+const HOSTNAME = "https://swagbook-django.herokuapp.com/facebook/"
 const auth_key = "Basic YXZpbmFzaDpyYXZ1bGFAMTIyOQ=="
 
 class SignupForm extends Component{

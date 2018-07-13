@@ -13,7 +13,7 @@ class ForgotPasswordForm extends Component{
     // this.changeThisTitle("Find Your Account");
   }
 
-  base_url = 'http://192.168.0.5:8000/'
+  base_url = 'https://swagbook-django.herokuapp.com/'
   state = {
     email_or_phonenum :'',
     showChangePasswordComponent:false,

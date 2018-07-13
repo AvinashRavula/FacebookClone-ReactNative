@@ -19,7 +19,7 @@ class LoginForm extends Component{
     state = {
         username : '',
         password: '',
-        jwt_url : 'http://192.168.0.5:8000/facebook/api-jwt-token-auth/',
+        jwt_url : 'https://swagbook-django.herokuapp.com/facebook/api-jwt-token-auth/',
     }
 
     styles = StyleSheet.create({
@@ -75,11 +75,8 @@ class LoginForm extends Component{
                 token = 'Basic ' + base64.encode(this.state.username + ":" + this.state.password);
                 SecureStore.setItemAsync("user_token",token)
                 .then((response) => {
-                    SecureStore.setItemAsync("user_id",myJson.user.toString())
-                    .then((resp) => {
                         console.log("navigating to mainscreen");
                         navigate("MainScreen");
-                    })                    
                 })
                 .catch(e => console.log("Error at securestore", e));
                 

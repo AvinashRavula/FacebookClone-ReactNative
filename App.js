@@ -24,6 +24,8 @@ import { MenuActivity } from "./Home/Menu";
 import {createMaterialTopTabNavigator} from 'react-navigation';
 import { MainScreenActivity } from './Home/MainScreen';
 import {StartUpScreen} from './Home/StartUpScreen';
+import { SearchUsers } from "./Home/SearchUsers";
+import { MessengerActivity } from "./Home/Messenger";
 import Icon from 'react-native-vector-icons/FontAwesome'; 
 
 const LoginAuthContext = React.createContext(null);
@@ -65,6 +67,8 @@ export default class App extends React.Component {
 		EditProfile: {screen: EditProfileActivity},
 		Friends: {screen: FriendsActivity},
 		ExploreFriends:{screen: Explore_Friends},
+		Search: { screen: SearchUsers},
+		Messenger: {screen : MessengerActivity},
 		}
 		,
 		{

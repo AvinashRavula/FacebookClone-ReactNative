@@ -5,7 +5,7 @@ import { HomeActivity } from "./HomePage";
 import { Explore_Friends } from "./ExploreFriends";
 import {NotificationActivity} from './Notification';
 import { MenuActivity } from "./Menu";
-import {StatusBar, View, Text, Dimensions, StyleSheet, Image} from 'react-native';
+import {StatusBar, View, Text, Dimensions, StyleSheet, Image, Alert, TouchableHighlight} from 'react-native';
 import { Header } from 'react-native-elements';
 // import FontAwesome, {Icon} from 'react-native-vector-icons/FontAwesome'
 import TabBarItem from 'react-native-vector-icons/FontAwesome';
@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import fontawesome from '@fortawesome/fontawesome'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckSquare, faCoffee } from '@fortawesome/fontawesome-free-solid'
+import { TextInput } from 'react-native-gesture-handler';
 
 fontawesome.library.add(faCheckSquare, faCoffee);
 
@@ -63,22 +64,26 @@ const MainScreenTabNavigator = createMaterialTopTabNavigator({
 			showLabel:false,
 			showIcon: true,
 		},
+		initialRouteName:'Home'
 	});
 
 
 const ClickableIcon = (props) => {
 	return(
 		<View style={{margin:10}}>
-			<Icon size={30} name={props.name} color={props.color} />
+			<Icon size={30} name={props.name} color={props.color} 
+					onPress={() => props.navigate('Search')} />
 		</View>
 	);
 }
 
-const HeaderRightComponents = () =>{
+const HeaderRightComponents = (props) =>{
 	return (
 		<View style={{flexDirection:"row"}}> 
-			<ClickableIcon size={30} name="search" color="white"/>
-			<Image source={require('../assets/messenger_icon_white.png')} style={styles.headerImage}/>
+			<ClickableIcon size={30} name="search" color="white" {...props}/>
+			<TouchableHighlight onPress={()=> props.navigate('Messenger')}>
+				<Image source={require('../assets/messenger_icon_white.png')} style={styles.headerImage}/>
+			</TouchableHighlight>	
 		</View>
 	);
 }
@@ -88,14 +93,14 @@ export class MainScreenActivity extends React.Component{
 	static navigationOptions = ({ navigation }) => {
         const {navigate, state} = navigation;
         return {
-          title: 'Facebook Clone',
-          style:{color:'white'},
+          title: 'Swagbook',
+		  style:{color:'white'},
           headerTitleStyle : {textAlign: 'center',alignSelf:'center', fontWeight:'normal', color:'white'},
           headerStyle:{
               backgroundColor:fb_color,
 		  },
 		  headerLeft: <ClickableIcon name="camera" color="white"/>,
-		  headerRight: <HeaderRightComponents/>,
+		  headerRight: <HeaderRightComponents navigate={navigate}/>,
         };
     };
 
